@@ -1,7 +1,7 @@
 struct pixel{
-    Quantum red;
-    Quantum green;
-    Quantum blue;
+    unsigned red;
+    unsigned green;
+    unsigned blue;
 };
 
 static int cmp_quant(const void *p1, const void *p2){
@@ -10,12 +10,16 @@ static int cmp_quant(const void *p1, const void *p2){
 static int reverse_cmp_quant(const void *p1, const void *p2){
     return *(Quantum *)p1 < *(Quantum *)p2;
 }
+static int cmp_color(const void *p1, const void *p2){
+    return *(size_t *)p1 < *(size_t *)p2;
+}
 static int cmp_pixel(const void *p1, const void *p2){
     const struct pixel *px1 = p1;
     const struct pixel *px2 = p2;
+   // printf("%d + %d + %d = %d\n",px1->red,px1->green,px1->blue,px1->red + px1->green + px1->blue );
     return
             (px1->red + px1->green + px1->blue)
-            <
+            >=
             (px2->red + px2->green + px2->blue);
 }
 
@@ -150,6 +154,7 @@ void total_sort(char const *sours, char const *res){
     PixelIterator *imw_1,*imw_res;
     PixelWand **pmw_1,**pmw_res;
     struct pixel *pix;
+    double *colors;
     Quantum *qr_1,*qg_1,*qb_1;
 
     unsigned long y;
@@ -171,25 +176,29 @@ void total_sort(char const *sours, char const *res){
     imw_res = NewPixelIterator(mw_res);
 
     long int hw = height*width;
-    pix = (struct pixel*)malloc(hw*sizeof(struct pixel));
+    //pix = (struct pixel*)malloc(hw*sizeof(struct pixel));
+    colors = (double*)malloc(hw*sizeof(double));
 
     for(y = 0;y < height; ++y){
         pmw_1  = PixelGetNextIteratorRow(imw_1, &width);
         for (x = 0;x < width; ++x){
-            pix[x+y*width].red   = PixelGetRedQuantum(pmw_1[x]);
-            pix[x+y*width].blue  = PixelGetBlueQuantum(pmw_1[x]);
-            pix[x+y*width].green = PixelGetGreenQuantum(pmw_1[x]);
+        //    pix[x+y*width].red   = PixelGetRedQuantum(pmw_1[x]);
+        //    pix[x+y*width].blue  = PixelGetBlueQuantum(pmw_1[x]);
+        //    pix[x+y*width].green = PixelGetGreenQuantum(pmw_1[x]);
+            colors[x+y*width] = PixelGetFuzz(pmw_1[x]);
         }
     }
 
-    qsort(pix,hw,sizeof(struct pixel),cmp_pixel);
+    //qsort(pix,hw,sizeof(struct pixel),cmp_pixel);
+    qsort(colors,hw,sizeof(double),cmp_color);
 
     for (y = 0;y < height; ++y){
         pmw_res = PixelGetNextIteratorRow(imw_res, &width);
         for (x = 0;x < (long)width; ++x){
-            PixelSetRedQuantum(pmw_res[x], pix[x+y*width].red );
-            PixelSetGreenQuantum(pmw_res[x], pix[x+y*width].green );
-            PixelSetBlueQuantum(pmw_res[x], pix[x+y*width].blue );
+        //    PixelSetRedQuantum(pmw_res[x], pix[x+y*width].red );
+        //    PixelSetGreenQuantum(pmw_res[x], pix[x+y*width].green );
+        //    PixelSetBlueQuantum(pmw_res[x], pix[x+y*width].blue );
+            PixelSetFuzz(pmw_res[x], colors[x+y*width]);
         }
         PixelSyncIterator(imw_res);
     }
@@ -201,6 +210,7 @@ void total_sort(char const *sours, char const *res){
     imw_res = DestroyPixelIterator(imw_res);
     mw_res = DestroyMagickWand(mw_res);
 
-    free(pix);
+    //free(pix);
+    free(colors);
     MagickWandTerminus();
 }

@@ -1,4 +1,4 @@
-void cartoon(char const *sours, char const *res){
+void average(char const *sours, char const *res){
     MagickWand *mw_1,*mw_res;
     PixelIterator *imw_1,*imw_res;
     PixelWand **pmw_1,**pmw_res;
@@ -7,10 +7,6 @@ void cartoon(char const *sours, char const *res){
     unsigned long y;
     register long x;
     unsigned int width,height;
-    Quantum q_max = (1 << (sizeof(Quantum)*8)) - 1;
-    Quantum q_aver = (1 << (sizeof(Quantum)*8)) >> 1;
-
-    printf("%d %d",q_max,q_aver);
 
     MagickWandGenesis();
 
@@ -18,7 +14,7 @@ void cartoon(char const *sours, char const *res){
     MagickReadImage(mw_1, sours);
     width = MagickGetImageWidth(mw_1);
     height = MagickGetImageHeight(mw_1);
-    printf("Cartooning img width %d\nheight %d\n",width,height);
+    printf("Average img width %d\nheight %d\n",width,height);
     mw_res = NewMagickWand();
     MagickSetSize(mw_res,width,height);
     MagickReadImage(mw_res,"xc:none");
@@ -33,10 +29,7 @@ void cartoon(char const *sours, char const *res){
             qr_1 = PixelGetRedQuantum(pmw_1[x]);
             qg_1 = PixelGetGreenQuantum(pmw_1[x]);
             qb_1 = PixelGetBlueQuantum(pmw_1[x]);
-
-            qr_1 = qr_1 > (q_aver) ? q_max : 0;
-            qb_1 = qb_1 > (q_aver) ? q_max : 0;
-            qg_1 = qg_1 > (q_aver) ? q_max : 0;
+            qr_1 = qb_1 = qg_1 = (qr_1 + qb_1 + qg_1)/3;
 
             PixelSetRedQuantum(pmw_res[x], qr_1 );
             PixelSetGreenQuantum(pmw_res[x], qg_1 );
@@ -54,3 +47,4 @@ void cartoon(char const *sours, char const *res){
 
     MagickWandTerminus();
 }
+ 
