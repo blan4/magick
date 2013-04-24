@@ -9,14 +9,17 @@
 #include "average.h"
 #include "dependence.h"
 #include "function.h"
+#include "lines.h"
 
 //gcc `MagickWand-config --cflags --cppflags` -o main main.c `MagickWand-config --ldflags --libs`
 
 int main(int argc, char const *argv[])
 {
     srand(time(NULL));
-    float (*functions[4]) (unsigned int,unsigned int)={dev,sinxy,loga,logax};
-    function(argv[1],argv[2],functions[atoi(argv[3])]);
+    lines_offset(argv[1],argv[2],atoi(argv[3]));
+ //   lines(argv[1],argv[2]);
+ //   float (*functions[4]) (unsigned int,unsigned int)={dev,sinxy,loga,logax};
+ //   function(argv[1],argv[2],functions[atoi(argv[3])]);
  //   function_add(argv[1],argv[2],atoi(argv[3]),logax);
  //   dependence(argv[1],argv[2],atoi(argv[3]));
  //   average(argv[1],argv[2]);

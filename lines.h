@@ -1,27 +1,4 @@
-#include "math.h"
-float dev(unsigned int x, unsigned int y){
-    float res=0;
-    res = x;
-    res/= (y+1);
-    return res; 
-}
-float sinxy(unsigned int x, unsigned int y){
-    float res=0;
-    res = sin(x*y);
-    return res;
-}
-float loga(unsigned int x, unsigned int y){
-    float res=0;
-    res = y;
-    res /= (x+1);
-    res = log(res);
-    return res;
-}
-float logax(unsigned int x, unsigned int y){
-    return log(y);
-}
-
-void function(char const *sours, char const *res, float (*fun)(unsigned int x,unsigned int y)){
+void lines(char const *sours, char const *res){
     MagickWand *mw_1,*mw_res;
     PixelIterator *imw_1,*imw_res;
     PixelWand **pmw_1,**pmw_res;
@@ -30,7 +7,6 @@ void function(char const *sours, char const *res, float (*fun)(unsigned int x,un
     unsigned long y;
     register long x;
     unsigned int width,height;
-    float xy;
 
     MagickWandGenesis();
 
@@ -38,7 +14,7 @@ void function(char const *sours, char const *res, float (*fun)(unsigned int x,un
     MagickReadImage(mw_1, sours);
     width = MagickGetImageWidth(mw_1);
     height = MagickGetImageHeight(mw_1);
-    printf("Function img width %d\nheight %d\n",width,height);
+    printf("lining img width %d\nheight %d\n",width,height);
     mw_res = NewMagickWand();
     MagickSetSize(mw_res,width,height);
     MagickReadImage(mw_res,"xc:none");
@@ -50,16 +26,19 @@ void function(char const *sours, char const *res, float (*fun)(unsigned int x,un
         pmw_1  = PixelGetNextIteratorRow(imw_1, &width);
         pmw_res = PixelGetNextIteratorRow(imw_res, &width);
         for (x = 0;x < (long)width; ++x){
-            xy = fun(x,y);
-            qr_1 = PixelGetRedQuantum(pmw_1[x])*xy;
-            qg_1 = PixelGetGreenQuantum(pmw_1[x])*xy;
-            qb_1 = PixelGetBlueQuantum(pmw_1[x])*xy;
+            qr_1 = PixelGetRedQuantum(pmw_1[x]);
+            qg_1 = PixelGetGreenQuantum(pmw_1[x]);
+            qb_1 = PixelGetBlueQuantum(pmw_1[x]);
 
-
-            PixelSetRedQuantum(pmw_res[x], qr_1 );
-            PixelSetGreenQuantum(pmw_res[x], qg_1 );
-            PixelSetBlueQuantum(pmw_res[x], qb_1 );
-
+            if (x%2){
+            	PixelSetRedQuantum(pmw_res[width-x],  qr_1 );
+            	PixelSetGreenQuantum(pmw_res[width-x], qg_1 );
+            	PixelSetBlueQuantum(pmw_res[width-x], qb_1 );
+            }else{
+            	PixelSetRedQuantum(pmw_res[x], qr_1 );
+            	PixelSetGreenQuantum(pmw_res[x], qg_1 );
+            	PixelSetBlueQuantum(pmw_res[x], qb_1 );
+            }
         }
         PixelSyncIterator(imw_res);
     }
@@ -72,10 +51,11 @@ void function(char const *sours, char const *res, float (*fun)(unsigned int x,un
     mw_res = DestroyMagickWand(mw_res);
 
     MagickWandTerminus();
-} 
+}
+ 
 
 
-void function_add(char const *sours, char const *res,unsigned k, float (*fun)(unsigned int x,unsigned int y)){
+void lines_offset(char const *sours, char const *res,int round){
     MagickWand *mw_1,*mw_res;
     PixelIterator *imw_1,*imw_res;
     PixelWand **pmw_1,**pmw_res;
@@ -84,7 +64,7 @@ void function_add(char const *sours, char const *res,unsigned k, float (*fun)(un
     unsigned long y;
     register long x;
     unsigned int width,height;
-    float xy;
+    unsigned int offset;
 
     MagickWandGenesis();
 
@@ -92,7 +72,7 @@ void function_add(char const *sours, char const *res,unsigned k, float (*fun)(un
     MagickReadImage(mw_1, sours);
     width = MagickGetImageWidth(mw_1);
     height = MagickGetImageHeight(mw_1);
-    printf("Function img width %d\nheight %d\n",width,height);
+    printf("lining img width %d\nheight %d\n",width,height);
     mw_res = NewMagickWand();
     MagickSetSize(mw_res,width,height);
     MagickReadImage(mw_res,"xc:none");
@@ -103,17 +83,21 @@ void function_add(char const *sours, char const *res,unsigned k, float (*fun)(un
     for(y = 0;y < height; ++y){
         pmw_1  = PixelGetNextIteratorRow(imw_1, &width);
         pmw_res = PixelGetNextIteratorRow(imw_res, &width);
+        offset = rand() % round;
         for (x = 0;x < (long)width; ++x){
-            xy = fun(x,y)*k;
-            qr_1 = PixelGetRedQuantum(pmw_1[x])+xy;
-            qg_1 = PixelGetGreenQuantum(pmw_1[x])+xy;
-            qb_1 = PixelGetBlueQuantum(pmw_1[x])+xy;
+            qr_1 = PixelGetRedQuantum(pmw_1[x]);
+            qg_1 = PixelGetGreenQuantum(pmw_1[x]);
+            qb_1 = PixelGetBlueQuantum(pmw_1[x]);
 
-
-            PixelSetRedQuantum(pmw_res[x], qr_1 );
-            PixelSetGreenQuantum(pmw_res[x], qg_1 );
-            PixelSetBlueQuantum(pmw_res[x], qb_1 );
-
+            if (x + offset < width){
+                PixelSetRedQuantum(pmw_res[x+offset],  qr_1 );
+                PixelSetGreenQuantum(pmw_res[x+offset], qg_1 );
+                PixelSetBlueQuantum(pmw_res[x+offset], qb_1 );
+            }else{
+                PixelSetRedQuantum(pmw_res[x+offset-width], qr_1 );
+                PixelSetGreenQuantum(pmw_res[x+offset-width], qg_1 );
+                PixelSetBlueQuantum(pmw_res[x+offset-width], qb_1 );
+            }
         }
         PixelSyncIterator(imw_res);
     }
