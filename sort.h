@@ -3,7 +3,11 @@ struct pixel{
     unsigned green;
     unsigned blue;
 };
-
+struct quant{
+    Quantum red;
+    Quantum green;
+    Quantum blue;
+};
 static int cmp_quant(const void *p1, const void *p2){
     return *(Quantum *)p1 >= *(Quantum *)p2;
 }
@@ -212,5 +216,96 @@ void total_sort(char const *sours, char const *res){
 
     //free(pix);
     free(colors);
+    MagickWandTerminus();
+}
+
+
+void super_sort(char const *sours, char const *res){
+    MagickWand *mw_1,*mw_res;
+    PixelIterator *imw_1,*imw_res;
+    PixelWand **pmw_1,**pmw_res;
+    struct quant **rgb;
+    Quantum temp;
+    unsigned long y;
+    register long x;
+    unsigned int width,height;
+
+    MagickWandGenesis();
+
+    mw_1 = NewMagickWand();
+    MagickReadImage(mw_1, sours);
+    width = MagickGetImageWidth(mw_1);
+    height = MagickGetImageHeight(mw_1);
+    printf("Sort rows img\nwidth %d\nheight %d\n",width,height);
+    mw_res = NewMagickWand();
+    MagickSetSize(mw_res,width,height);
+    MagickReadImage(mw_res,"xc:none");
+
+    imw_1  = NewPixelIterator(mw_1);
+    imw_res = NewPixelIterator(mw_res);
+
+    rgb = (struct quant**)malloc(height*sizeof(struct quant*));
+    for(y = 0;y < height; ++y){
+        pmw_1  = PixelGetNextIteratorRow(imw_1, &width);
+        rgb[y] = (struct quant*)malloc(width*sizeof(struct quant));
+        for (x = 0;x < (long)width; ++x){
+            rgb[y][x].red = PixelGetRedQuantum(pmw_1[x]);
+            rgb[y][x].green = PixelGetGreenQuantum(pmw_1[x]);
+            rgb[y][x].blue = PixelGetBlueQuantum(pmw_1[x]);
+        }
+    }
+
+    int i,j,k;
+    char save = 0;
+    for (k = 0; k < height; ++k){    
+        for (j = 1; j < width ; ++j){
+            for (i = 0; i < j; ++i){
+                if (rgb[k][i].red > rgb[k][i+1].red){
+                    temp = rgb[k][i].red;
+                    rgb[k][i].red = rgb[k][i+1].red;
+                    rgb[k][i+1].red = temp;
+                    save = 1; 
+                }
+                if (rgb[k][i].green > rgb[k][i+1].green){
+                    temp = rgb[k][i].green;
+                    rgb[k][i].green = rgb[k][i+1].green;
+                    rgb[k][i+1].green = temp;
+                    save = 1; 
+                }
+                if (rgb[k][i].blue > rgb[k][i+1].blue){
+                    temp = rgb[k][i].blue;
+                    rgb[k][i].blue = rgb[k][i+1].blue;
+                    rgb[k][i+1].blue = temp;
+                    save = 1; 
+                }
+                if (save){
+                    save = 0;
+                }
+            }
+        }
+        
+    }
+
+
+
+
+    for(y = 0;y < height; ++y){
+        pmw_res = PixelGetNextIteratorRow(imw_res, &width);
+        for (x = 0;x < (long)width; ++x){
+            PixelSetRedQuantum(pmw_res[x], rgb[y][x].red );
+            PixelSetGreenQuantum(pmw_res[x], rgb[y][x].green );
+            PixelSetBlueQuantum(pmw_res[x], rgb[y][x].blue );
+        }
+        PixelSyncIterator(imw_res);
+    }
+
+    MagickWriteImage(mw_res,res);
+
+
+    imw_1 = DestroyPixelIterator(imw_1);
+    mw_1 = DestroyMagickWand(mw_1);
+    imw_res = DestroyPixelIterator(imw_res);
+    mw_res = DestroyMagickWand(mw_res);
+
     MagickWandTerminus();
 }

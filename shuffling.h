@@ -22,7 +22,29 @@ void shuffle(Quantum *qr, Quantum *qg, Quantum *qb){
         break;
     }
 }
-
+void shuffle_case(Quantum *qr, Quantum *qg, Quantum *qb,int rnd){
+    Quantum r=*qr,b=*qb,g=*qg;
+    switch (rnd-1){
+    case 0:
+        *qr=b; *qg=g;*qb=r;
+        break;
+    case 1:
+        *qr=g; *qg=b;*qb=r;
+        break;
+    case 2:
+        *qr=g; *qg=r; *qb=b;
+        break;
+    case 3:
+        *qr=b; *qg=g; *qb=r;
+        break;
+    case 4:
+        *qr=r; *qg=b; *qb=g;
+        break;
+    case 5:
+        //nothing to do
+        break;
+    }
+}
 void shuffling(char const *sours, char const *res){
     MagickWand *mw_1,*mw_res;
     PixelIterator *imw_1,*imw_res;
