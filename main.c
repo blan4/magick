@@ -11,12 +11,14 @@
 #include "function.h"
 #include "lines.h"
 #include "brick.h"
+#include "diffusion.h"
 //gcc `MagickWand-config --cflags --cppflags` -o main main.c `MagickWand-config --ldflags --libs`
 
 int main(int argc, char const *argv[])
 {
     srand(time(NULL));
-    brick_mix_pics(argv[1],argv[2],argv[3]);
+    diffusion(argv[1],argv[2],argv[3]);
+ //   brick_mix_pics(argv[1],argv[2],argv[3]);
  //   brick_mix_chanals(argv[1],argv[2]);
  //	  brick_colorful(atoi(argv[1]),atoi(argv[2]),argv[3]);
  //   lines_offset(argv[1],argv[2],atoi(argv[3]));
