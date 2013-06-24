@@ -1,9 +1,3 @@
-/**
- * @function findContours_Demo.cpp
- * @brief Demo code to find contours in an image
- * @author OpenCV team
- */
-
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include <iostream>
@@ -23,7 +17,7 @@ RNG rng(12345);
 const char* source_window = "Source";
 
 
-/// Function header
+
 vector<Point2f> aproxCorners(std::vector<Point2f>);//находим классы близких точек и объединяем их.
 void find_corners(Mat&);
 void thresh_callback_fix(int,void*);
@@ -31,9 +25,6 @@ Point2f computeIntersect(Vec4i, Vec4i);//поиск пересечений ли�
 int sortCorners(vector<Point2f>&, Point2f);// определение порядка углов четырехугольника
 
 
-/**
- * @function main
- */
 int main(int argc, char const *argv[])
 {
   /// Load source image and convert it to gray
@@ -44,7 +35,6 @@ int main(int argc, char const *argv[])
   cvtColor( src, src_gray, CV_RGB2GRAY );
   GaussianBlur(src_gray,src_gray,Size(3,3),0);
 
-  /// Create Window
   namedWindow( source_window, WINDOW_AUTOSIZE );
   imshow( source_window, src );
 
