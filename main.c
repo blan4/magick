@@ -18,7 +18,7 @@
 int main(int argc, char const *argv[])
 {
     srand(time(NULL));
-    merge(argv[1],argv[2],argv[3]);
+    merge_chanal(argv[1],argv[2],argv[3]);
  //   average_pic(argv[1],argv[2],argv[3]);
  //   diffusion(argv[1],argv[2],argv[3]);
  //   brick_mix_pics(argv[1],argv[2],argv[3]);
