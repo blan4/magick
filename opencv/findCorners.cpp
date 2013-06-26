@@ -18,7 +18,7 @@ const char* source_window = "Source";
 
 
 
-vector<Point2f> aproxCorners(std::vector<Point2f>);//находим классы близких точек и объединяем их.
+void aproxCorners(std::vector<Point2f>&);//находим классы близких точек и объединяем их.
 void find_corners(Mat&);
 void thresh_callback_fix(int,void*);
 Point2f computeIntersect(Vec4i, Vec4i);//поиск пересечений линий
@@ -127,7 +127,7 @@ void find_corners(Mat& contour){
   }
   
   cout << "Counting" << endl;
-  corners = aproxCorners(corners);
+  aproxCorners(corners);
   cout << "New" << endl;
   
   for (vector<Point2f>::const_iterator i = corners.begin();i != corners.end(); ++i){
@@ -208,12 +208,12 @@ cv::Point2f computeIntersect(cv::Vec4i a, cv::Vec4i b){
 }  
 
 
-vector<Point2f> aproxCorners(vector<Point2f> corners){
+void aproxCorners(vector<Point2f>& corners){
   vector<Point2f> apr;
-  Point2f average;
+  Point2f average,current;
   unsigned unchecked = corners.size();
   vector<bool> flags(unchecked,false);
-  Rect r(-5,-5,10,10);//окрестность
+  Rect r(-16,-16,32,32);//окрестность
   size_t i,j,
     len=flags.size();
   while (unchecked){
@@ -231,24 +231,24 @@ vector<Point2f> aproxCorners(vector<Point2f> corners){
 
     flags[i] = true;
     unchecked--;
-    average = corners[i];
-    cout << i << " "<<average<<endl;
+    current = average = corners[i];
     ///////!!!!!!!!!!!!!!!! FIX MEEEEEEEEEEEEEEE
     for(size_t iter = i; iter<len; ++iter){
       if ( flags[iter] == false ){//т.е не проверяли точку
-        cout << average << " - "<< corners[iter] << " = " <<(average - corners[iter]);
-        if ((average - corners[iter]).inside(r)){
+        cout << current << " - "<< corners[iter] << " = " <<(current - corners[iter]);
+        if ((current - corners[iter]).inside(r)){
           average = (average + corners[iter]) * 0.5;
           flags[iter] = true;
           unchecked--;
-          cout << "inside";
+          cout << " inside";
         }
-        cout << endl;
+        cout<<endl;
       }
     }
     apr.push_back(average);
   }
-  return apr;
+  corners.clear();
+  corners = apr;
 }
 
 
