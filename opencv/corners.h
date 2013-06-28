@@ -5,5 +5,24 @@
 #include <stdlib.h>
 namespace Corners
 {
-	std::vector<cv::Point2f> find(cv::Mat src, unsigned thresh);	
+	int find(
+		cv::Mat 					src, 
+		unsigned 					thresh,
+		std::vector<cv::Point2f>& 	corners);
+	
+	int find_corners(
+		cv::Mat& 					contour, 
+		unsigned 					thresh,
+		std::vector<cv::Point2f>& 	_corners);
+	
+	cv::Point2f computeIntersect(
+		cv::Vec4i 	a, 
+		cv::Vec4i 	b);
+	
+	int aproxCorners(
+		std::vector<cv::Point2f>& corners);
+
+	int sortCorners(
+		std::vector<cv::Point2f>& 	corners, 
+		cv::Point2f 				center);	
 }
